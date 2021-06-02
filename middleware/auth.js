@@ -5,15 +5,16 @@ const Recipes = require("../models/recipesModel")
 async function verifyToken(req, res, next) {
   try {
     const token = req.headers.authorization.replace("Bearer ", "")
-    const user = jwt.verify(token, SECRET_KEY)
-
-    req.body.user = user
-  } catch (err) {
-    {
-      err
+    if (token) {
+      const user = jwt.verify(token, SECRET_KEY)
+      req.body.user = user
+      next()
+    } else {
+      res.json({ message: "unauthorized" })
     }
+  } catch (err) {
+    res.json(err)
   }
-  next()
 }
 
 async function checkId(req, res, next) {

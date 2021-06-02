@@ -24,7 +24,7 @@ async function logIn(req, res) {
 
     if (bcrypt.compareSync(Password, user.Password)) {
       const token = jwt.sign({ Email: user.Email, id: user.id }, SECRET_KEY)
-      res.json({ message: token })
+      res.json({ token: token })
     } else {
       res.json({ message: "wrong password" })
     }
