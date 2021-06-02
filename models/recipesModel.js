@@ -85,7 +85,7 @@ Recipes.getRecipe = (recipeId) => {
 }
 
 Recipes.addRecipe = async (data, id) => {
-  const { Name, Ingredient, Instructions } = data
+  const { Name} = data
   
 
   try {
