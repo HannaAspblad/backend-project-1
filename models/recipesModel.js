@@ -22,19 +22,13 @@ const RecipeDetails = db.define("RecipeDetails", {
     allowNull: false,
   },
 })
-
+RecipeDetails.removeAttribute("id")
 Recipes.belongsTo(User)
 RecipeDetails.belongsTo(Recipes)
-//RecipeDetails.hasMany(Ingredients)
 
-
-
-
+Ingredients.hasMany(RecipeDetails)
 
 Recipes.getAllRecipes = async (page, filter) => {
-
-
-
   let limit = 10
   let offset = (page - 1) * limit
 
@@ -64,7 +58,7 @@ Recipes.getAllRecipes = async (page, filter) => {
           Name: { [Op.substring]: filter },
         },
         offset: offset,
-        limit: limit
+        limit: limit,
       })
 
       return recipes
@@ -77,16 +71,6 @@ Recipes.getAllRecipes = async (page, filter) => {
     } catch (err) {}
   }
 }
-
-
-
-
-
-
-
-
-
-
 
 Recipes.getRecipe = (recipeId) => {
   try {
@@ -101,10 +85,40 @@ Recipes.getRecipe = (recipeId) => {
 }
 
 Recipes.addRecipe = async (data, id) => {
+  const { Name, Ingredient, Instructions } = data
+  
+
   try {
-    const newRecipe = await Recipes.create({ Name: data, UserId: id })
-    return newRecipe
+    const recipe = await Recipes.create({
+      Name: Name,
+      UserId: id,
+    })
+
+    const recipeId = recipe.dataValues.id
+    const recipeData = {data: data, recipeId: recipeId}
+
+    return recipeData
   } catch (err) {}
+}
+Recipes.addRecipeInstructions = async (recipeData) => {
+const {Name, Instructions} = recipeData.data
+const ingredients = recipeData.data.Ingredient
+const recipeId = recipeData.recipeId
+
+  
+  ingredients.forEach(async (ingredient) => {
+    
+    try {
+      const recipeDetails = await RecipeDetails.create({
+        Name: Name,
+        RecipeId: recipeId,
+        IngredientId: ingredient,
+        Instructions: Instructions,
+      })
+
+      return recipeDetails
+    } catch (err) {}
+  })
 }
 
 Recipes.editRecipe = async (data, recipeId) => {

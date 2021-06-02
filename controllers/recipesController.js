@@ -39,16 +39,36 @@ async function getRecipe(req, res) {
 }
 
 async function addRecipe(req, res) {
-  const { Name } = req.body
+  
   let userId = req.body.user.id
-  console.log(req.body)
+  let newRecipe = null
 
   try {
-    await Recipes.addRecipe(Name, userId)
+    newRecipe = await Recipes.addRecipe(req.body, userId)
     res.json({ message: "new recipe added" })
   } catch (err) {
     res.json(err)
   }
+  
+  addRecipeInstructions(newRecipe)
+  return
+}
+
+
+
+
+
+
+async function addRecipeInstructions(recipeData){
+
+
+  try{
+    const newRecipe = await Recipes.addRecipeInstructions(recipeData)
+    return newRecipe
+  }catch(err){
+    
+  }
+
 }
 
 async function editRecipe(req, res) {
@@ -91,4 +111,5 @@ module.exports = {
   addRecipe,
   editRecipe,
   deleteRecipe,
+  addRecipeInstructions
 }
