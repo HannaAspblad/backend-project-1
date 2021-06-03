@@ -102,7 +102,7 @@ Recipes.addRecipe = async (data, id) => {
 }
 Recipes.addRecipeInstructions = async (recipeData) => {
 const {Name, Instructions} = recipeData.data
-const ingredients = recipeData.data.Ingredient
+const ingredients = recipeData.data.Ingredients
 const recipeId = recipeData.recipeId
 
   
