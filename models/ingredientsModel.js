@@ -17,7 +17,7 @@ Ingredients.getIngredients = async (page, filter) => {
 
   if (page && !filter) {
     try {
-      const ingredients = Ingredients.findAll({
+      const ingredients = await Ingredients.findAll({
         offset: offset,
         limit: limit,
       })
@@ -26,7 +26,7 @@ Ingredients.getIngredients = async (page, filter) => {
     } catch (err) {}
   } else if (filter && !page) {
     try {
-      const ingredients = Ingredients.findAll({
+      const ingredients = await Ingredients.findAll({
         where: {
           Name: { [Op.substring]: filter },
         },
@@ -36,7 +36,7 @@ Ingredients.getIngredients = async (page, filter) => {
     } catch (err) {}
   } else if (filter && page) {
     try {
-      const ingredients = Ingredients.findAll({
+      const ingredients = await Ingredients.findAll({
         where: {
           Name: { [Op.substring]: filter },
         },
@@ -48,7 +48,7 @@ Ingredients.getIngredients = async (page, filter) => {
     } catch (err) {}
   } else {
     try {
-      const ingredients = Ingredients.findAll()
+      const ingredients = await Ingredients.findAll()
 
       return ingredients
     } catch (err) {}

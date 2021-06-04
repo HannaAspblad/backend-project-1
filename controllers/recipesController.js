@@ -2,25 +2,18 @@ require("dotenv").config()
 
 const Recipes = require("../models/recipesModel.js")
 
-
 async function getAllRecipes(req, res) {
-
-
   let { page, filter } = req.query
 
   if (page == undefined || page == 0) {
     page = false
-  
   }
   if (filter == undefined) {
     filter = false
   }
 
-
-
-
   try {
-    const results = await Recipes.getAllRecipes(page,filter)
+    const results = await Recipes.getAllRecipes(page, filter)
     res.json(results)
   } catch (err) {
     res.json(err)
@@ -39,7 +32,6 @@ async function getRecipe(req, res) {
 }
 
 async function addRecipe(req, res) {
-  
   let userId = req.body.user.id
   let newRecipe = null
 
@@ -49,48 +41,34 @@ async function addRecipe(req, res) {
   } catch (err) {
     res.json(err)
   }
-  
+
   addRecipeInstructions(newRecipe)
   return
 }
 
-
-
-
-
-
-async function addRecipeInstructions(recipeData){
-
-
-  try{
+async function addRecipeInstructions(recipeData) {
+  try {
     const newRecipe = await Recipes.addRecipeInstructions(recipeData)
     return newRecipe
-  }catch(err){
-    
-  }
-
+  } catch (err) {}
 }
 
 async function editRecipe(req, res) {
-
-
-  const { Name } = req.body
+  const data = req.body
 
   try {
-    await Recipes.editRecipe(Name, req.params.id)
-    res.json({ message: "recipe updated" })
+    //await deleteRecipe(req.params.id)
 
-    
+    await Recipes.editRecipe(data, req.params.id)
   } catch (err) {
     res.json(err)
   }
 
+  res.json({ message: "recipe updated" })
 }
 
 async function deleteRecipe(req, res) {
   const { id } = req.params
-
-
 
   try {
     const deleted = await Recipes.deleteRecipe(id)
@@ -111,5 +89,5 @@ module.exports = {
   addRecipe,
   editRecipe,
   deleteRecipe,
-  addRecipeInstructions
+  addRecipeInstructions,
 }

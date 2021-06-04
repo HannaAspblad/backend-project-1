@@ -5,12 +5,12 @@ const Ingredients = require("../models/ingredientsModel.js")
 
 
 
-Recipes.bulkCreate([
+// Recipes.bulkCreate([
 
-  {Name: 'Lasagne'},
-  {Name: 'Potatismos'},
-  {Name: 'Soppa'}
-])
+//   {Name: 'Lasagne'},
+//   {Name: 'Potatismos'},
+//   {Name: 'Soppa'}
+// ])
 
 Ingredients.bulkCreate([
   { Name: "Asparagus" },

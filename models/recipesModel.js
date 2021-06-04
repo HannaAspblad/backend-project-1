@@ -22,59 +22,82 @@ const RecipeDetails = db.define("RecipeDetails", {
     allowNull: false,
   },
 })
+
 RecipeDetails.removeAttribute("id")
+
 Recipes.belongsTo(User)
+User.hasMany(Recipes)
+
 RecipeDetails.belongsTo(Recipes)
+Recipes.hasMany(RecipeDetails)
 
-Ingredients.hasMany(RecipeDetails)
 
-Recipes.getAllRecipes = async (page, filter) => {
-  let limit = 10
-  let offset = (page - 1) * limit
+RecipeDetails.belongsTo(Ingredients);
 
-  if (page && !filter) {
-    try {
-      const recipes = Recipes.findAll({
-        offset: offset,
-        limit: limit,
-      })
 
-      return recipes
-    } catch (err) {}
-  } else if (filter && !page) {
-    try {
-      const recipes = Recipes.findAll({
-        where: {
-          Name: { [Op.substring]: filter },
-        },
-      })
 
-      return recipes
-    } catch (err) {}
-  } else if (filter && page) {
-    try {
-      const recipes = Recipes.findAll({
-        where: {
-          Name: { [Op.substring]: filter },
-        },
-        offset: offset,
-        limit: limit,
-      })
+Recipes.getAllRecipes = async()=>{
 
-      return recipes
-    } catch (err) {}
-  } else {
-    try {
-      const recipes = Recipes.findAll()
+  try{
 
-      return recipes
-    } catch (err) {}
+    
+    const recipes = await Recipes.findAll({ include: RecipeDetails, required: true });
+    console.log(JSON.stringify(recipes));
+
+    return recipes
+  }catch(err){
+
   }
+
 }
 
-Recipes.getRecipe = (recipeId) => {
+// Recipes.getAllRecipes = async (page, filter) => {
+//   let limit = 10
+//   let offset = (page - 1) * limit
+
+//   if (page && !filter) {
+//     try {
+//       const recipes = await Recipe.findAll({
+//         offset: offset,
+//         limit: limit,
+//       })
+
+//       return recipes
+//     } catch (err) {}
+//   } else if (filter && !page) {
+//     try {
+//       const recipes = await Recipe.findAll({
+//         where: {
+//           Name: { [Op.substring]: filter },
+//         },
+//       })
+
+//       return recipes
+//     } catch (err) {}
+//   } else if (filter && page) {
+//     try {
+//       const recipes = await Recipe.findAll({
+//         where: {
+//           Name: { [Op.substring]: filter },
+//         },
+//         offset: offset,
+//         limit: limit,
+//       })
+
+//       return recipes
+//     } catch (err) {}
+//   } else {
+//     try {
+//       const recipes = await Recipes.findAll()
+
+//       return recipes
+//     } catch (err) {}
+//   }
+// }
+
+Recipes.getRecipe = async (recipeId) => {
   try {
-    const recipe = Recipes.findOne({
+    const recipe = await Recipes.findOne({
       where: {
         id: recipeId,
       },
@@ -85,8 +108,7 @@ Recipes.getRecipe = (recipeId) => {
 }
 
 Recipes.addRecipe = async (data, id) => {
-  const { Name} = data
-  
+  const { Name } = data
 
   try {
     const recipe = await Recipes.create({
@@ -95,19 +117,17 @@ Recipes.addRecipe = async (data, id) => {
     })
 
     const recipeId = recipe.dataValues.id
-    const recipeData = {data: data, recipeId: recipeId}
+    const recipeData = { data: data, recipeId: recipeId }
 
     return recipeData
   } catch (err) {}
 }
 Recipes.addRecipeInstructions = async (recipeData) => {
-const {Name, Instructions} = recipeData.data
-const ingredients = recipeData.data.Ingredients
-const recipeId = recipeData.recipeId
+  const { Name, Instructions } = recipeData.data
+  const ingredients = recipeData.data.Ingredients
+  const recipeId = recipeData.recipeId
 
-  
   ingredients.forEach(async (ingredient) => {
-    
     try {
       const recipeDetails = await RecipeDetails.create({
         Name: Name,
@@ -121,26 +141,42 @@ const recipeId = recipeData.recipeId
   })
 }
 
-Recipes.editRecipe = async (data, recipeId) => {
-  try {
-    const edited = await Recipes.update(
-      { Name: data },
-      { where: { id: recipeId } }
-    )
+Recipes.editRecipe = async (recipeData, recipeId) => {
+  const { Name, Instructions } = recipeData
+  const ingredients = recipeData.Ingredients
 
-    return edited
-  } catch (err) {}
+  ingredients.forEach(async (ingredient) => {
+    try {
+      const edited = await RecipeDetails.update(
+        {
+          Name: Name,
+          IngredientId: ingredient,
+          Instructions: Instructions,
+          
+        },
+        { where: { RecipeId: recipeId } }
+      )
+
+      return edited
+    } catch (err) {}
+  })
 }
 
 Recipes.deleteRecipe = async (recipeId) => {
   try {
-    const deleted = Recipes.destroy({
+    
+    const deleted = await Recipes.destroy({
+     
       where: {
         id: recipeId,
-      },
-    })
+      }
+    }).then(await RecipeDetails.destroy({where:{
+      recipeId: null
+    }}))
 
     return deleted
+
+
   } catch (err) {}
 }
 
