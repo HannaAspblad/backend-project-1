@@ -64,9 +64,10 @@ async function editRecipe(req, res) {
   const data = req.body
 
   try {
-    
 
     await Recipes.editRecipe(data, req.params.id)
+
+    
   } catch (err) {
     res.json(err)
   }

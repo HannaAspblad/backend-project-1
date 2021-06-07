@@ -2,8 +2,7 @@ const db = require("../database/connection.js")
 
 const { DataTypes } = require("sequelize")
 const User = require("./userModel")
-const {IngredientList } = require("./ingredientsModel.js")
-
+const { IngredientList } = require("./ingredientsModel.js")
 
 const Recipes = db.define("Recipes", {
   Name: {
@@ -15,21 +14,15 @@ const Recipes = db.define("Recipes", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-
-
 })
-
-
 
 User.hasMany(Recipes)
 Recipes.belongsTo(User)
-
 
 Recipes.getAllRecipes = async () => {
   try {
     const recipes = await RecipeDetails.findAll()
 
-  
     //gruppera recepten till ett objekt
     //const recipes = await RecipeDetails.findAll({ group: "" })
 
@@ -113,18 +106,14 @@ Recipes.addRecipe = async (data, id) => {
 }
 //byt namn på funktionen
 Recipes.addRecipeInstructions = async (recipeData, list) => {
-  
   const recipeId = recipeData.recipeId
-  
+
   list.forEach(async (ingredient) => {
-    
     try {
-    
       await IngredientList.create({
         RecipeId: recipeId,
         IngredientId: ingredient,
       })
-      
 
       return ingredientList
     } catch (err) {}
@@ -134,20 +123,11 @@ Recipes.addRecipeInstructions = async (recipeData, list) => {
 Recipes.editRecipe = async (recipeData, recipeId) => {
   const { Name, Instructions } = recipeData
   const ingredients = recipeData.Ingredients
-  
 
   try {
     const updated = await IngredientList.destroy({
       where: {
         RecipeId: recipeId,
-      },
-    })
-
-    await Recipes.update({
-      Name: Name,
-      Instructions: Instructions,
-      where: {
-        id: recipeId,
       },
     })
 
@@ -158,23 +138,15 @@ Recipes.editRecipe = async (recipeData, recipeId) => {
       })
     })
 
+    const edit = await Recipes.findOne({ where: { id: recipeId } })
+
+    edit.Name = Name
+    edit.Instructions = Instructions
+    await edit.save()
+
+   
     return updated
   } catch (err) {}
-
-  // ingredients.forEach(async (ingredient) => {
-  //   try {
-  //     const edited = await RecipeDetails.update(
-  //       {
-  //         Name: Name,
-  //         IngredientId: ingredient,
-  //         Instructions: Instructions,
-  //       },
-  //       { where: { RecipeId: recipeId } }
-  //     )
-
-  //     return edited
-  //   } catch (err) {}
-  // })
 }
 
 Recipes.deleteRecipe = async (recipeId) => {
