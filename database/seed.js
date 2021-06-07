@@ -1,16 +1,11 @@
-const User = require("../models/userModel.js")
-const Recipes = require("../models/recipesModel.js")
-const RecipeDetails = require("../models/recipesModel.js")
-const Ingredients = require("../models/ingredientsModel.js")
+//const User = require("../models/userModel.js")
+//const Recipes = require("../models/recipesModel.js")
+const {Ingredients} = require("../models/ingredientsModel.js")
 
 
 
-// Recipes.bulkCreate([
 
-//   {Name: 'Lasagne'},
-//   {Name: 'Potatismos'},
-//   {Name: 'Soppa'}
-// ])
+
 
 Ingredients.bulkCreate([
   { Name: "Asparagus" },

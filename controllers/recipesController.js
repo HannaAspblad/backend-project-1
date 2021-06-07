@@ -1,5 +1,6 @@
 require("dotenv").config()
 
+
 const Recipes = require("../models/recipesModel.js")
 
 async function getAllRecipes(req, res) {
@@ -14,6 +15,7 @@ async function getAllRecipes(req, res) {
 
   try {
     const results = await Recipes.getAllRecipes(page, filter)
+    
     res.json(results)
   } catch (err) {
     res.json(err)
@@ -25,6 +27,7 @@ async function getRecipe(req, res) {
 
   try {
     const recipe = await Recipes.getRecipe(id)
+    
     res.json(recipe)
   } catch (err) {
     res.json(err)
@@ -32,7 +35,8 @@ async function getRecipe(req, res) {
 }
 
 async function addRecipe(req, res) {
-  let userId = req.body.user.id
+  const userId = req.body.user.id
+  const ingredientList = req.body.Ingredients
   let newRecipe = null
 
   try {
@@ -41,14 +45,17 @@ async function addRecipe(req, res) {
   } catch (err) {
     res.json(err)
   }
-
-  addRecipeInstructions(newRecipe)
+//byt namn på funktionen
+  addRecipeInstructions(newRecipe, ingredientList)
+  
   return
 }
-
-async function addRecipeInstructions(recipeData) {
+//byt namn på funktionen
+async function addRecipeInstructions(recipeData, list) {
   try {
-    const newRecipe = await Recipes.addRecipeInstructions(recipeData)
+    //byt namn på funktionen
+    const newRecipe = await Recipes.addRecipeInstructions(recipeData, list)
+    
     return newRecipe
   } catch (err) {}
 }
@@ -57,7 +64,7 @@ async function editRecipe(req, res) {
   const data = req.body
 
   try {
-    //await deleteRecipe(req.params.id)
+    
 
     await Recipes.editRecipe(data, req.params.id)
   } catch (err) {

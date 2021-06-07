@@ -6,7 +6,28 @@ const Ingredients = db.define("Ingredients", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  
+  
 })
+
+const IngredientList = db.define("IngredientList", {
+  
+  
+  RecipeId: {
+    type: DataTypes.NUMBER,
+    allowNull: false,
+  },
+
+  IngredientId: {
+    type: DataTypes.NUMBER,
+    allowNull: false,
+  },
+
+})
+
+
+IngredientList.removeAttribute("id")
+
 
 Ingredients.getIngredients = async (page, filter) => {
 
@@ -55,4 +76,4 @@ Ingredients.getIngredients = async (page, filter) => {
   }
 }
 
-module.exports = Ingredients
+module.exports = {Ingredients, IngredientList}

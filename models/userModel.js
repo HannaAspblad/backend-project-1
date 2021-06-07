@@ -2,7 +2,7 @@ const db = require("../database/connection.js")
 const { DataTypes } = require("sequelize")
 const bcrypt = require("bcryptjs")
 const salt = 10
-const Recipes = require('./userModel')
+
 
 const User = db.define("User", {
   Email: {
@@ -18,6 +18,8 @@ const User = db.define("User", {
     allowNull: false,
   },
 })
+
+
 
 User.registerUser = async (email, password) => {
   const hashed = bcrypt.hashSync(password, salt)

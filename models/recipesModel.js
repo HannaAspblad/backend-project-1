@@ -2,16 +2,10 @@ const db = require("../database/connection.js")
 
 const { DataTypes } = require("sequelize")
 const User = require("./userModel")
-const Ingredients = require("./ingredientsModel.js")
+const {IngredientList } = require("./ingredientsModel.js")
+
 
 const Recipes = db.define("Recipes", {
-  Name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-})
-
-const RecipeDetails = db.define("RecipeDetails", {
   Name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -21,34 +15,28 @@ const RecipeDetails = db.define("RecipeDetails", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+
+
 })
 
-RecipeDetails.removeAttribute("id")
 
-Recipes.belongsTo(User)
+
 User.hasMany(Recipes)
-
-RecipeDetails.belongsTo(Recipes)
-Recipes.hasMany(RecipeDetails)
+Recipes.belongsTo(User)
 
 
-RecipeDetails.belongsTo(Ingredients);
+Recipes.getAllRecipes = async () => {
+  try {
+    const recipes = await RecipeDetails.findAll()
 
+  
+    //gruppera recepten till ett objekt
+    //const recipes = await RecipeDetails.findAll({ group: "" })
 
-
-Recipes.getAllRecipes = async()=>{
-
-  try{
-
-    
-    const recipes = await Recipes.findAll({ include: RecipeDetails, required: true });
-    console.log(JSON.stringify(recipes));
+    //lista alla ingredienser efter namn och räkna
 
     return recipes
-  }catch(err){
-
-  }
-
+  } catch (err) {}
 }
 
 // Recipes.getAllRecipes = async (page, filter) => {
@@ -108,11 +96,12 @@ Recipes.getRecipe = async (recipeId) => {
 }
 
 Recipes.addRecipe = async (data, id) => {
-  const { Name } = data
+  const { Name, Instructions } = data
 
   try {
     const recipe = await Recipes.create({
       Name: Name,
+      Instructions: Instructions,
       UserId: id,
     })
 
@@ -122,21 +111,22 @@ Recipes.addRecipe = async (data, id) => {
     return recipeData
   } catch (err) {}
 }
-Recipes.addRecipeInstructions = async (recipeData) => {
-  const { Name, Instructions } = recipeData.data
-  const ingredients = recipeData.data.Ingredients
+//byt namn på funktionen
+Recipes.addRecipeInstructions = async (recipeData, list) => {
+  
   const recipeId = recipeData.recipeId
-
-  ingredients.forEach(async (ingredient) => {
+  
+  list.forEach(async (ingredient) => {
+    
     try {
-      const recipeDetails = await RecipeDetails.create({
-        Name: Name,
+    
+      await IngredientList.create({
         RecipeId: recipeId,
         IngredientId: ingredient,
-        Instructions: Instructions,
       })
+      
 
-      return recipeDetails
+      return ingredientList
     } catch (err) {}
   })
 }
@@ -144,39 +134,64 @@ Recipes.addRecipeInstructions = async (recipeData) => {
 Recipes.editRecipe = async (recipeData, recipeId) => {
   const { Name, Instructions } = recipeData
   const ingredients = recipeData.Ingredients
+  
 
-  ingredients.forEach(async (ingredient) => {
-    try {
-      const edited = await RecipeDetails.update(
-        {
-          Name: Name,
-          IngredientId: ingredient,
-          Instructions: Instructions,
-          
-        },
-        { where: { RecipeId: recipeId } }
-      )
+  try {
+    const updated = await IngredientList.destroy({
+      where: {
+        RecipeId: recipeId,
+      },
+    })
 
-      return edited
-    } catch (err) {}
-  })
+    await Recipes.update({
+      Name: Name,
+      Instructions: Instructions,
+      where: {
+        id: recipeId,
+      },
+    })
+
+    ingredients.forEach(async (ingredient) => {
+      await IngredientList.create({
+        RecipeId: recipeId,
+        IngredientId: ingredient,
+      })
+    })
+
+    return updated
+  } catch (err) {}
+
+  // ingredients.forEach(async (ingredient) => {
+  //   try {
+  //     const edited = await RecipeDetails.update(
+  //       {
+  //         Name: Name,
+  //         IngredientId: ingredient,
+  //         Instructions: Instructions,
+  //       },
+  //       { where: { RecipeId: recipeId } }
+  //     )
+
+  //     return edited
+  //   } catch (err) {}
+  // })
 }
 
 Recipes.deleteRecipe = async (recipeId) => {
   try {
-    
     const deleted = await Recipes.destroy({
-     
       where: {
         id: recipeId,
-      }
-    }).then(await RecipeDetails.destroy({where:{
-      recipeId: null
-    }}))
+      },
+    })
+
+    await IngredientList.destroy({
+      where: {
+        RecipeId: recipeId,
+      },
+    })
 
     return deleted
-
-
   } catch (err) {}
 }
 
@@ -192,4 +207,4 @@ Recipes.matchOwnerId = async (userId, recipeId) => {
     return match
   } catch (err) {}
 }
-;(module.exports = Recipes), RecipeDetails
+module.exports = Recipes
