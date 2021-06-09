@@ -1,6 +1,6 @@
 //const User = require("../models/userModel.js")
 //const Recipes = require("../models/recipesModel.js")
-const {Ingredients} = require("../models/ingredientsModel.js")
+const Ingredients = require("../models/ingredientsModel.js")
 
 
 

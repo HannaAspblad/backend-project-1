@@ -1,6 +1,7 @@
 const db = require("../database/connection.js")
 const { DataTypes, Op } = require("sequelize")
 
+
 const Ingredients = db.define("Ingredients", {
   Name: {
     type: DataTypes.STRING,
@@ -10,23 +11,6 @@ const Ingredients = db.define("Ingredients", {
   
 })
 
-const IngredientList = db.define("IngredientList", {
-  
-  
-  RecipeId: {
-    type: DataTypes.NUMBER,
-    allowNull: false,
-  },
-
-  IngredientId: {
-    type: DataTypes.NUMBER,
-    allowNull: false,
-  },
-
-})
-
-
-IngredientList.removeAttribute("id")
 
 
 Ingredients.getIngredients = async (page, filter) => {
@@ -76,4 +60,4 @@ Ingredients.getIngredients = async (page, filter) => {
   }
 }
 
-module.exports = {Ingredients, IngredientList}
+module.exports = Ingredients

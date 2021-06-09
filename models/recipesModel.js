@@ -2,7 +2,9 @@ const db = require("../database/connection.js")
 
 const { DataTypes } = require("sequelize")
 const User = require("./userModel")
-const { IngredientList } = require("./ingredientsModel.js")
+const Ingredients = require("./ingredientsModel.js")
+const IngredientList = require("./IngredientListsModel")
+
 
 const Recipes = db.define("Recipes", {
   Name: {
@@ -19,9 +21,28 @@ const Recipes = db.define("Recipes", {
 User.hasMany(Recipes)
 Recipes.belongsTo(User)
 
+Recipes.hasMany(IngredientList)
+
+IngredientList.belongsTo(Recipes)
+
+//IngredientList.hasMany(Ingredients)
+
+//Ingredients.belongsTo(IngredientList)
+
 Recipes.getAllRecipes = async () => {
   try {
-    const recipes = await RecipeDetails.findAll()
+    const recipes = Recipes.findAll({
+      attributes: ["Name", "Instructions"],
+      include: [
+        {
+          model: IngredientList,
+          attributes: ["IngredientId"],
+        },
+        // {
+        //   model: Ingredients,
+        // }
+      ],
+    })
 
     //gruppera recepten till ett objekt
     //const recipes = await RecipeDetails.findAll({ group: "" })
@@ -78,11 +99,23 @@ Recipes.getAllRecipes = async () => {
 
 Recipes.getRecipe = async (recipeId) => {
   try {
-    const recipe = await Recipes.findOne({
+    const recipe = await Recipes.findAll({
       where: {
         id: recipeId,
       },
+      attributes: ["Name", "Instructions"],
+
+      include: [{ model: IngredientList, attributes: ["IngredientId"] }],
     })
+
+    recipe.forEach(async (ingredient) => {
+      const { IngredientId } = ingredient.IngredientLists[1]
+
+     console.log(IngredientId)
+    })
+
+    
+    
 
     return recipe
   } catch (err) {}
@@ -144,7 +177,6 @@ Recipes.editRecipe = async (recipeData, recipeId) => {
     edit.Instructions = Instructions
     await edit.save()
 
-   
     return updated
   } catch (err) {}
 }
