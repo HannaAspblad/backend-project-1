@@ -1,4 +1,4 @@
-const ingredients = require("../models/ingredientsModel.js")
+const Ingredients = require("../models/ingredientsModel.js")
 
 async function getIngredients(req, res) {
   let { page, filter } = req.query
@@ -12,7 +12,7 @@ async function getIngredients(req, res) {
   }
 
   try {
-    const results = await ingredients.getIngredients(page, filter)
+    const results = await Ingredients.getIngredients(page, filter)
     res.json(results)
   } catch (err) {
     res.json(err)
