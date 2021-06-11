@@ -2,9 +2,9 @@ const db = require("../database/connection.js")
 
 const { DataTypes } = require("sequelize")
 const User = require("./userModel")
-const Ingredients = require("./ingredientsModel.js")
+//const Ingredients = require("./ingredientsModel.js")
 const IngredientList = require("./IngredientListsModel")
-
+const Ingredients = require("./ingredientsModel.js")
 
 const Recipes = db.define("Recipes", {
   Name: {
@@ -22,12 +22,12 @@ User.hasMany(Recipes)
 Recipes.belongsTo(User)
 
 Recipes.hasMany(IngredientList)
-
 IngredientList.belongsTo(Recipes)
 
-//IngredientList.hasMany(Ingredients)
 
-//Ingredients.belongsTo(IngredientList)
+//IngredientList.hasMany(Ingredients)
+Ingredients.hasMany(IngredientList)
+IngredientList.belongsTo(Ingredients)
 
 Recipes.getAllRecipes = async () => {
   try {
@@ -97,25 +97,37 @@ Recipes.getAllRecipes = async () => {
 //   }
 // }
 
+// Recipes.getRecipe = async (recipeId) => {
+//   try {
+//     const recipe = await Recipes.findAll({
+//       where: {
+//         id: recipeId,
+//       },
+//       attributes: ["Name", "Instructions"],
+
+//       include: [
+//         { model: Ingredients,
+//           attributes: ["IngredientId"] }],
+//           where:{
+//             id: recipeId
+//           }
+//     })
+
 Recipes.getRecipe = async (recipeId) => {
   try {
-    const recipe = await Recipes.findAll({
-      where: {
-        id: recipeId,
-      },
+    let recipe = await Recipes.findAll({
+      where: { id: recipeId },
       attributes: ["Name", "Instructions"],
 
-      include: [{ model: IngredientList, attributes: ["IngredientId"] }],
+      include: {
+        model: IngredientList,
+        include:{model: Ingredients}
+      },
+
+      
     })
 
-    recipe.forEach(async (ingredient) => {
-      const { IngredientId } = ingredient.IngredientLists[1]
-
-     console.log(IngredientId)
-    })
-
-    
-    
+  
 
     return recipe
   } catch (err) {}
