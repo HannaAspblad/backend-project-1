@@ -1,22 +1,14 @@
 const db = require("../database/connection.js")
 const { DataTypes, Op } = require("sequelize")
 
-
 const Ingredients = db.define("Ingredients", {
   Name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  
-  
 })
 
-
-
 Ingredients.getIngredients = async (page, filter) => {
-
-
-
   let limit = 10
   let offset = (page - 1) * limit
 
@@ -46,7 +38,7 @@ Ingredients.getIngredients = async (page, filter) => {
           Name: { [Op.substring]: filter },
         },
         offset: offset,
-        limit: limit
+        limit: limit,
       })
 
       return ingredients

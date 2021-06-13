@@ -1,12 +1,7 @@
 const db = require("../database/connection.js")
 const { DataTypes, Op } = require("sequelize")
 
-
-
-
 const IngredientList = db.define("IngredientList", {
-  
-  
   RecipeId: {
     type: DataTypes.NUMBER,
     allowNull: false,
@@ -16,15 +11,6 @@ const IngredientList = db.define("IngredientList", {
     type: DataTypes.NUMBER,
     allowNull: false,
   },
-
 })
-
-
-
-
-
-
-
-
 
 module.exports = IngredientList

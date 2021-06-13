@@ -2,9 +2,9 @@ const db = require("../database/connection.js")
 
 const { DataTypes } = require("sequelize")
 const User = require("./userModel")
-//const Ingredients = require("./ingredientsModel.js")
 const IngredientList = require("./IngredientListsModel")
 const Ingredients = require("./ingredientsModel.js")
+const { sequelize } = require("./userModel")
 
 const Recipes = db.define("Recipes", {
   Name: {
@@ -24,110 +24,114 @@ Recipes.belongsTo(User)
 Recipes.hasMany(IngredientList)
 IngredientList.belongsTo(Recipes)
 
-
-//IngredientList.hasMany(Ingredients)
 Ingredients.hasMany(IngredientList)
 IngredientList.belongsTo(Ingredients)
 
-Recipes.getAllRecipes = async () => {
-  try {
-    const recipes = Recipes.findAll({
-      attributes: ["Name", "Instructions"],
-      include: [
-        {
-          model: IngredientList,
-          attributes: ["IngredientId"],
-        },
-        // {
-        //   model: Ingredients,
-        // }
-      ],
-    })
-
-    //gruppera recepten till ett objekt
-    //const recipes = await RecipeDetails.findAll({ group: "" })
-
-    //lista alla ingredienser efter namn och räkna
-
-    return recipes
-  } catch (err) {}
-}
-
-// Recipes.getAllRecipes = async (page, filter) => {
-//   let limit = 10
-//   let offset = (page - 1) * limit
-
-//   if (page && !filter) {
-//     try {
-//       const recipes = await Recipe.findAll({
-//         offset: offset,
-//         limit: limit,
-//       })
-
-//       return recipes
-//     } catch (err) {}
-//   } else if (filter && !page) {
-//     try {
-//       const recipes = await Recipe.findAll({
-//         where: {
-//           Name: { [Op.substring]: filter },
-//         },
-//       })
-
-//       return recipes
-//     } catch (err) {}
-//   } else if (filter && page) {
-//     try {
-//       const recipes = await Recipe.findAll({
-//         where: {
-//           Name: { [Op.substring]: filter },
-//         },
-//         offset: offset,
-//         limit: limit,
-//       })
-
-//       return recipes
-//     } catch (err) {}
-//   } else {
-//     try {
-//       const recipes = await Recipes.findAll()
-
-//       return recipes
-//     } catch (err) {}
-//   }
-// }
-
-// Recipes.getRecipe = async (recipeId) => {
+// Recipes.getAllRecipes = async () => {
 //   try {
-//     const recipe = await Recipes.findAll({
-//       where: {
-//         id: recipeId,
-//       },
+
+//     let recipes = await Recipes.findAll({
 //       attributes: ["Name", "Instructions"],
 
-//       include: [
-//         { model: Ingredients,
-//           attributes: ["IngredientId"] }],
-//           where:{
-//             id: recipeId
-//           }
+//       include: {
+//         model: IngredientList,
+//         attributes: ['IngredientId'],
+//         include: { model: Ingredients, attributes:['Name'] },
+
+//       },
 //     })
+
+//     return recipes
+//   } catch (err) {}
+// }
+
+Recipes.getAllRecipes = async (page, filter) => {
+  let limit = 10
+  let offset = (page - 1) * limit
+
+  if (page && !filter) {
+    try {
+      const recipes = await Recipes.findAll({
+        offset: offset,
+        limit: limit,
+        attributes: ["Name", "Instructions", "id", "UserId"],
+
+        include: {
+          model: IngredientList,
+          attributes: ["IngredientId"],
+          include: { model: Ingredients, attributes: ["Name"] },
+        },
+      })
+
+      return recipes
+    } catch (err) {}
+  } else if (filter && !page) {
+    try {
+      const recipes = await Recipes.findAll({
+        where: {
+          Name: filter,
+        },
+        offset: offset,
+        limit: limit,
+        attributes: ["Name", "Instructions", "id", "UserId"],
+
+        include: {
+          model: IngredientList,
+          attributes: ["IngredientId"],
+          include: { model: Ingredients, attributes: ["Name"] },
+        },
+      })
+
+      return recipes
+    } catch (err) {}
+  } else if (filter && page) {
+    try {
+      const recipes = await Recipes.findAll({
+        where: {
+          Name: filter,
+        },
+        offset: offset,
+        limit: limit,
+        attributes: ["Name", "Instructions", "id", "UserId"],
+
+        include: {
+          model: IngredientList,
+          attributes: ["IngredientId"],
+          include: { model: Ingredients, attributes: ["Name"] },
+        },
+      })
+
+      return recipes
+    } catch (err) {}
+  } else {
+    try {
+      const recipes = await Recipes.findAll({
+        attributes: ["Name", "Instructions", "id", "UserId"],
+
+        include: {
+          model: IngredientList,
+          attributes: ["IngredientId"],
+          include: { model: Ingredients, attributes: ["Name"] },
+        },
+      })
+
+      return recipes
+    } catch (err) {}
+  }
+}
 
 Recipes.getRecipe = async (recipeId) => {
   try {
-    let recipe = await Recipes.findAll({
+    const recipe = await Recipes.findOne({
       where: { id: recipeId },
-      attributes: ["Name", "Instructions"],
+      attributes: ["Name", "Instructions", "id", "UserId"],
 
       include: {
         model: IngredientList,
-        include:{model: Ingredients}
+        attributes: ["IngredientId"],
+        include: { model: Ingredients, attributes: ["Name"] },
       },
-
-      
     })
-
-  
 
     return recipe
   } catch (err) {}
@@ -149,8 +153,8 @@ Recipes.addRecipe = async (data, id) => {
     return recipeData
   } catch (err) {}
 }
-//byt namn på funktionen
-Recipes.addRecipeInstructions = async (recipeData, list) => {
+
+Recipes.addIngredients = async (recipeData, list) => {
   const recipeId = recipeData.recipeId
 
   list.forEach(async (ingredient) => {

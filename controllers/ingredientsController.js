@@ -5,7 +5,6 @@ async function getIngredients(req, res) {
 
   if (page == undefined || page == 0) {
     page = false
-  
   }
   if (filter == undefined) {
     filter = false

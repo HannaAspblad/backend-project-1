@@ -3,7 +3,6 @@ const { DataTypes } = require("sequelize")
 const bcrypt = require("bcryptjs")
 const salt = 10
 
-
 const User = db.define("User", {
   Email: {
     type: DataTypes.STRING,
@@ -18,8 +17,6 @@ const User = db.define("User", {
     allowNull: false,
   },
 })
-
-
 
 User.registerUser = async (email, password) => {
   const hashed = bcrypt.hashSync(password, salt)
@@ -41,10 +38,5 @@ User.logIn = async (email) => {
     return user
   } catch (err) {}
 }
-
-
-
-
-
 
 module.exports = User

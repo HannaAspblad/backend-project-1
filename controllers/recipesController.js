@@ -1,6 +1,5 @@
 require("dotenv").config()
 
-
 const Recipes = require("../models/recipesModel.js")
 
 async function getAllRecipes(req, res) {
@@ -15,7 +14,7 @@ async function getAllRecipes(req, res) {
 
   try {
     const results = await Recipes.getAllRecipes(page, filter)
-    
+
     res.json(results)
   } catch (err) {
     res.json(err)
@@ -27,7 +26,7 @@ async function getRecipe(req, res) {
 
   try {
     const recipe = await Recipes.getRecipe(id)
-    
+
     res.json(recipe)
   } catch (err) {
     res.json(err)
@@ -45,17 +44,16 @@ async function addRecipe(req, res) {
   } catch (err) {
     res.json(err)
   }
-//byt namn på funktionen
-  addRecipeInstructions(newRecipe, ingredientList)
-  
+
+  addIngredients(newRecipe, ingredientList)
+
   return
 }
-//byt namn på funktionen
-async function addRecipeInstructions(recipeData, list) {
+
+async function addIngredients(recipeData, list) {
   try {
-    //byt namn på funktionen
-    const newRecipe = await Recipes.addRecipeInstructions(recipeData, list)
-    
+    const newRecipe = await Recipes.addIngredients(recipeData, list)
+
     return newRecipe
   } catch (err) {}
 }
@@ -64,10 +62,7 @@ async function editRecipe(req, res) {
   const data = req.body
 
   try {
-
     await Recipes.editRecipe(data, req.params.id)
-
-    
   } catch (err) {
     res.json(err)
   }
@@ -97,5 +92,5 @@ module.exports = {
   addRecipe,
   editRecipe,
   deleteRecipe,
-  addRecipeInstructions,
+  addIngredients,
 }
